@@ -11,6 +11,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-evenly",
     alignItems: "center",
+    marginBottom: 10,
   },
   dayHeader: {
     flexDirection: "row",
@@ -37,6 +38,26 @@ const styles = StyleSheet.create({
   weatherText: {
     color: "#555",
     fontSize: 12,
+  },
+  ncontainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  listStyle: {
+    marginVertical: 20,
+    maxHeight: 220,
+  },
+  imageContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+  image: {
+    width: 200,
+    height: 200,
+    borderRadius: 10,
+    resizeMode: "contain",
   },
 });
 export default styles;
