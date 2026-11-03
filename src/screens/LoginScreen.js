@@ -47,6 +47,7 @@ export default function LoginScreen({ route, navigation }) {
         login: foundUser,
       });
     }
+    //TO DO LATER: make a text that appears saying incorrect password and user at the top of user:
   }
 
   return (
