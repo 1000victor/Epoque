@@ -5,7 +5,8 @@ import { Button, View, Platform, Text } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Location from "expo-location";
 
-export default function CalenderScreen({ navigation }) {
+export default function CalenderScreen({ route, navigation }) {
+  const user = route.params?.foundUser;
   const [sunday, setSunday] = useState(() => {
     const date = new Date();
     date.setDate(date.getDate() - date.getDay());
@@ -94,7 +95,7 @@ export default function CalenderScreen({ navigation }) {
         longitude = location.coords.longitude;
       } else {
         console.error(
-          "Permission to access location was denied. Using default.",
+          "Permission to access location was denied. Using default."
         );
       }
       const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=weather_code&hourly=temperature_2m`;
