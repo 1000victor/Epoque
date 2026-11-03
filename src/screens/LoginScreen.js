@@ -43,12 +43,9 @@ export default function LoginScreen({ route, navigation }) {
       (item) => item.username === user && item.password === pass
     );
     if (foundUser) {
-      Alert.alert("Success", "Login successful!");
       navigation.navigate("CalendarScreen", {
         login: foundUser,
       });
-    } else {
-      Alert.alert("Error", "Invalid username or password");
     }
   }
 
