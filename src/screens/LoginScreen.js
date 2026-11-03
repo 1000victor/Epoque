@@ -15,7 +15,8 @@ export default function LoginScreen({ route, navigation }) {
   const [logins, setLogins] = useState([]);
   const [user, setUser] = useState("");
   const [pass, setPass] = useState("");
-
+  //to display incorrect username/password if user inputs wrong
+  const [errorMessage, setErrorMessage] = useState("");
   // Retrieve login information from Firebase
   useEffect(() => {
     async function fetchLogin() {
@@ -43,17 +44,19 @@ export default function LoginScreen({ route, navigation }) {
       (item) => item.username === user && item.password === pass
     );
     if (foundUser) {
+      setErrorMessage("");
       navigation.navigate("CalendarScreen", {
         login: foundUser,
       });
+    } else {
+      setErrorMessage("Incorrect Username/Password!");
     }
-    //TO DO LATER: make a text that appears saying incorrect password and user at the top of user:
   }
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login Screen</Text>
-
+      <Text style={styles.error}>{errorMessage}</Text>
       <TextInput
         style={styles.input}
         placeholder="Username"
@@ -61,7 +64,6 @@ export default function LoginScreen({ route, navigation }) {
         value={user}
         onChangeText={setUser}
       />
-
       <TextInput
         style={styles.input}
         placeholder="Password"
@@ -69,7 +71,6 @@ export default function LoginScreen({ route, navigation }) {
         value={pass}
         onChangeText={setPass}
       />
-
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
@@ -97,6 +98,10 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 15,
     borderRadius: 8,
+    color: "white",
+  },
+  error: {
+    margin: 1,
     color: "white",
   },
   button: {
