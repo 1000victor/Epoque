@@ -53,6 +53,10 @@ export default function LoginScreen({ route, navigation }) {
     }
   }
 
+  function register() {
+    navigation.navigate("RegistrationScreen");
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login Screen</Text>
@@ -73,6 +77,10 @@ export default function LoginScreen({ route, navigation }) {
       />
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.button} onPress={register}>
+        <Text style={styles.buttonText}>Register</Text>
       </TouchableOpacity>
     </View>
   );
@@ -109,6 +117,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
+    marginBottom: 10,
   },
   buttonText: {
     color: "black",
