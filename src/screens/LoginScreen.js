@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,6 +8,7 @@ import {
   Alert,
 } from "react-native";
 
+import { useFocusEffect } from "@react-navigation/native";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebaseConfig.js";
 
@@ -17,25 +18,28 @@ export default function LoginScreen({ route, navigation }) {
   const [pass, setPass] = useState("");
   //to display incorrect username/password if user inputs wrong
   const [errorMessage, setErrorMessage] = useState("");
-  // Retrieve login information from Firebase
-  useEffect(() => {
-    async function fetchLogin() {
-      try {
-        const querySnapshot = await getDocs(collection(db, "login"));
 
-        const loginList = querySnapshot.docs.map((document) => ({
-          id: document.id,
-          ...document.data(),
-        }));
+  //update login information from Firebase whenever screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      async function fetchLogin() {
+        try {
+          const querySnapshot = await getDocs(collection(db, "login"));
 
-        setLogins(loginList);
-      } catch (error) {
-        console.error("Error fetching login:", error);
+          const loginList = querySnapshot.docs.map((document) => ({
+            id: document.id,
+            ...document.data(),
+          }));
+
+          setLogins(loginList);
+        } catch (error) {
+          console.error("Error fetching login:", error);
+        }
       }
-    }
 
-    fetchLogin();
-  }, []);
+      fetchLogin();
+    }, [user])
+  );
 
   //Check username and password
   function handleLogin() {
@@ -43,6 +47,7 @@ export default function LoginScreen({ route, navigation }) {
       //find code found through here: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
       (item) => item.username === user && item.password === pass
     );
+
     if (foundUser) {
       setErrorMessage("");
       navigation.navigate("CalendarScreen", {
@@ -61,6 +66,7 @@ export default function LoginScreen({ route, navigation }) {
     <View style={styles.container}>
       <Text style={styles.title}>Login Screen</Text>
       <Text style={styles.error}>{errorMessage}</Text>
+
       <TextInput
         style={styles.input}
         placeholder="Username"
@@ -68,6 +74,7 @@ export default function LoginScreen({ route, navigation }) {
         value={user}
         onChangeText={setUser}
       />
+
       <TextInput
         style={styles.input}
         placeholder="Password"
@@ -75,6 +82,7 @@ export default function LoginScreen({ route, navigation }) {
         value={pass}
         onChangeText={setPass}
       />
+
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
