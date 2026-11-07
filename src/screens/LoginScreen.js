@@ -9,6 +9,7 @@ import { firebase_auth } from "../firebaseConfig";
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [theme, setTheme] = useState("dark");
 
   const auth = firebase_auth;
 
@@ -34,6 +35,7 @@ export default function LoginScreen({ navigation }) {
 
       navigation.navigate("CalendarScreen", {
         user: response.user,
+        theme: theme,
       });
     } catch (error) {
       console.log(error.message);
