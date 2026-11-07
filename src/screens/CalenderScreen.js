@@ -1,21 +1,38 @@
 import { StatusBar } from "expo-status-bar";
 import styles from "../styles";
-import { useState, useEffect } from "react";
-import { Button, View, Platform, Text } from "react-native";
+import { useState, useEffect, useCallback } from "react";
+import {
+  Button,
+  View,
+  Platform,
+  Text,
+  Pressable,
+  FlatList,
+  Image,
+} from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Location from "expo-location";
+import { useFocusEffect } from "@react-navigation/native";
+import * as SQLite from "expo-sqlite";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function CalenderScreen({ route, navigation }) {
   const user = route.params?.foundUser;
   const [sunday, setSunday] = useState(() => {
     const date = new Date();
     date.setDate(date.getDate() - date.getDay());
+    date.setHours(0, 0, 0, 0);
     return date;
   });
   const [showDatePicker, setShowDatePicker] = useState(false);
   // weatherJSON stored here
   const [weatherJSON, setWeatherJSON] = useState(null);
+  // If location disabled, weather will just say location disabled
+  const [locationStatus, setLocationStatus] = useState("loading");
+  const [eventData, setEventData] = useState({});
+  const [eventImages, setEventImages] = useState({});
 
+  // Weather codes provided by openmeteo api
   const weatherCode = {
     0: "Clear sky",
     1: "Mainly clear",
@@ -55,6 +72,7 @@ export default function CalenderScreen({ route, navigation }) {
     setSunday(() => {
       const newDate = new Date(currentDate);
       newDate.setDate(newDate.getDate() - newDate.getDay());
+      newDate.setHours(0, 0, 0, 0);
       return newDate;
     });
   };
@@ -67,7 +85,7 @@ export default function CalenderScreen({ route, navigation }) {
   });
 
   // function for changing months using arrows
-  function updateSunday(dir) {
+  const updateSunday = (dir) => {
     if (dir !== "next" && dir !== "prev") {
       throw new Error("Invalid dir passed into updateSunday()");
     }
@@ -78,62 +96,103 @@ export default function CalenderScreen({ route, navigation }) {
       } else if (dir === "prev") {
         updatedSunday.setDate(updatedSunday.getDate() - 7);
       }
+      updatedSunday.setHours(0, 0, 0, 0);
       return updatedSunday;
     });
-  }
+  };
 
-  // Function for fetching forecast array
-  async function fetchWeather() {
-    try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      let latitude = 52.52; // Default fallback
-      let longitude = 13.41;
+  // function to format day to "YYYY-MM-DD"
+  const formatDateString = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${d}`;
+  };
 
-      if (status === "granted") {
-        const location = await Location.getCurrentPositionAsync({});
-        latitude = location.coords.latitude;
-        longitude = location.coords.longitude;
-      } else {
-        console.error(
-          "Permission to access location was denied. Using default."
-        );
-      }
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=weather_code&hourly=temperature_2m`;
-      const response = await fetch(url);
-      if (!response.ok) {
-        console.error("Weather fetch failed");
-      }
-      const data = await response.json();
-      setWeatherJSON(data);
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
+  // function for grabbing forecast if day is 7 days ahead including now
   const getWeatherForDay = (day) => {
+    if (locationStatus === "denied") {
+      return "Location disabled";
+    }
     if (!weatherJSON || !weatherJSON.daily) {
       return "Loading weather...";
     }
-
-    // Format day to "YYYY-MM-DD"
-    const year = day.getFullYear();
-    const month = String(day.getMonth() + 1).padStart(2, "0");
-    const d = String(day.getDate()).padStart(2, "0");
-    const targetDateString = `${year}-${month}-${d}`;
-
     // indexOf finds the first occurance in an array, returns -1 if fails
-    const apiIndex = weatherJSON.daily.time.indexOf(targetDateString);
+    const apiIndex = weatherJSON.daily.time.indexOf(formatDateString(day));
 
     if (apiIndex !== -1) {
       const code = weatherJSON.daily.weather_code[apiIndex];
       return weatherCode[code] || "Unknown weather";
     }
-
     return "No forecast available";
   };
 
+  // Allows the calender to be up to date without having to look away
+  useFocusEffect(
+    useCallback(() => {
+      const loadWeek = async () => {
+        try {
+          const dateStrings = weekdays.map((day) => formatDateString(day));
+          const multiStoredText = await AsyncStorage.multiGet(dateStrings);
+          const texts = {};
+          multiStoredText.forEach(([dateString, titleNote]) => {
+            if (titleNote) {
+              try {
+                texts[dateString] = JSON.parse(titleNote);
+              } catch (e) {
+                // In case a non json is stored (only really happens while deving)
+                texts[dateString] = { title: titleNote };
+              }
+            }
+          });
+
+          const db = await SQLite.openDatabaseAsync("events.db");
+          const dbImages = await db.getAllAsync(
+            `SELECT * FROM images WHERE dateString IN (${dateStrings.map(() => "?").join(",")})`,
+            dateStrings,
+          );
+
+          const imagesMap = {};
+          dbImages.forEach((img) => {
+            if (!imagesMap[img.dateString]) {
+              imagesMap[img.dateString] = [];
+            }
+            imagesMap[img.dateString].push(img);
+          });
+          setEventData(texts);
+          setEventImages(imagesMap);
+        } catch (error) {
+          console.error("Failed to load week data:", error);
+        }
+      };
+      loadWeek();
+    }, [sunday]),
+  );
+
   // Load weather prediction array for next 7 days on mount
   useEffect(() => {
+    const fetchWeather = async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          setLocationStatus("denied");
+          return;
+        }
+        const location = await Location.getCurrentPositionAsync({});
+        const { latitude, longitude } = location.coords;
+
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=weather_code,temperature_2m_max&hourly=temperature_2m&timezone=auto`;
+        const response = await fetch(url);
+        if (!response.ok) {
+          console.error("Weather fetch failed");
+        }
+        const data = await response.json();
+        setWeatherJSON(data);
+        setLocationStatus("granted");
+      } catch (e) {
+        console.error(e);
+      }
+    };
     fetchWeather();
   }, []);
 
@@ -149,17 +208,59 @@ export default function CalenderScreen({ route, navigation }) {
         />
         <Button onPress={() => updateSunday("next")} title=">" />
       </View>
-      {weekdays.map((day, index) => (
-        <View key={index} style={styles.dayContainer}>
-          <View style={styles.dayHeader}>
-            <Text style={styles.dayText}>{day.toDateString()}</Text>
-            <Text style={styles.eventText}>Event Name Here</Text>
-            <Text style={styles.weatherText}>{getWeatherForDay(day)}</Text>
-          </View>
-          {/* Insert collection of images here */}
-          <Text>Images Here</Text>
-        </View>
-      ))}
+      <View style={{ flex: 1, justifyContent: "space-between" }}>
+        {weekdays.map((day, index) => {
+          const dateStr = formatDateString(day);
+          const currentEvent = eventData[dateStr];
+          const currentImages = eventImages[dateStr] || [];
+          const rawTitle = currentEvent?.title || "";
+          const truncatedTitle =
+            rawTitle.length > 35 ? rawTitle.substring(0, 35) + "..." : rawTitle;
+
+          return (
+            <Pressable
+              key={index}
+              style={styles.dayContainer}
+              onPress={() =>
+                navigation.navigate("EditEventScreen", { dateString: dateStr })
+              }
+            >
+              <View style={styles.dayHeader}>
+                <View style={{ flexDirection: "column" }}>
+                  <Text style={styles.dayText}>{day.toDateString()}</Text>
+                  <Text style={styles.eventText}>{truncatedTitle}</Text>
+                </View>
+
+                <Text style={styles.dayText}>{getWeatherForDay(day)}</Text>
+              </View>
+
+              {currentImages.length > 0 && (
+                <FlatList
+                  horizontal
+                  data={currentImages}
+                  keyExtractor={(img) => img.id.toString()}
+                  style={[styles.listStyle, { marginVertical: 2 }]}
+                  renderItem={({ item: img }) => (
+                    <View
+                      style={[
+                        styles.imageContainer,
+                        {
+                          width: 29,
+                          height: 29,
+                          aspectRatio: 3 / 4,
+                          marginRight: 2,
+                        },
+                      ]}
+                    >
+                      <Image source={{ uri: img.uri }} style={styles.image} />
+                    </View>
+                  )}
+                />
+              )}
+            </Pressable>
+          );
+        })}
+      </View>
 
       {showDatePicker && (
         <DateTimePicker

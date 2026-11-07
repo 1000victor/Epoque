@@ -11,32 +11,59 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-evenly",
     alignItems: "center",
+    marginBottom: 5,
   },
   dayHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
   },
   dayContainer: {
-    overflow: "hidden",
     flex: 1,
     backgroundColor: "#fff",
-    padding: 10,
+    padding: 5,
     borderWidth: 1,
     borderColor: "#ccc",
-    flexDirection: "column",
   },
   dayText: {
-    fontWeight: "bold",
     fontSize: 12,
+  },
+  eventDayText: {
+    fontSize: 12,
+    fontWeight: "bold",
+    fontSize: 16,
   },
   eventText: {
     fontSize: 12,
     color: "#333",
+    fontWeight: "bold",
   },
-  weatherText: {
-    color: "#555",
-    fontSize: 12,
+  listStyle: {
+    marginVertical: 10,
+    maxHeight: 140,
+  },
+  imageContainer: {
+    marginRight: 5,
+    aspectRatio: 3 / 4,
+    height: 140,
+    borderRadius: 8,
+    backgroundColor: "#ccc",
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 8,
+    resizeMode: "cover",
+  },
+  textinput: {
+    backgroundColor: "#fff",
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    textAlignVertical: "top",
+    fontSize: 14,
+    color: "#333",
+    marginBottom: 15,
   },
 });
 export default styles;
