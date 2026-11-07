@@ -53,6 +53,7 @@ export default function LoginScreen({ navigation }) {
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
+        placeholderTextColor="#787878"
       />
 
       {/* Password Input */}
@@ -62,15 +63,16 @@ export default function LoginScreen({ navigation }) {
         secureTextEntry={true} // hides text for security (dots/asterisks)
         value={password}
         onChangeText={setPassword}
+        placeholderTextColor="#787878"
       />
 
       {/* Action Buttons */}
       <View style={styles.buttonContainer}>
-        <Button title="Sign Up" onPress={handleSignUp} />
+        <Button title="Sign Up" onPress={handleSignUp} color="white" />
       </View>
 
       <View style={styles.buttonContainer}>
-        <Button title="Sign In" onPress={handleSignIn} />
+        <Button title="Sign In" onPress={handleSignIn} color="white" />
       </View>
     </View>
   );
@@ -81,24 +83,35 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     padding: 16,
-    backgroundColor: "#f2f2f2",
+    backgroundColor: "#0F0F0F",
   },
   header: {
     fontSize: 24,
     marginBottom: 24,
     textAlign: "center",
+    color: "white",
   },
   input: {
     height: 40,
-    borderColor: "#ccc",
+    borderColor: "white",
     borderWidth: 1,
     marginBottom: 12,
     paddingHorizontal: 8,
     borderRadius: 4,
-    backgroundColor: "white",
+    backgroundColor: "#1D1D1D",
+    color: "white",
   },
   buttonContainer: {
-    padding: 20,
+    marginTop: 15,
+    marginBottom: 15,
+    padding: 5,
+    borderColor: "white",
+    borderWidth: 1,
+    color: "white",
+    borderRadius: 40,
+    backgroundColor: "#1D1D1D",
+    width: 200,
+    alignSelf: "center",
   },
   footer: {
     marginTop: 20,
