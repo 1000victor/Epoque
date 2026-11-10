@@ -70,11 +70,11 @@ export default function LoginScreen({ navigation }) {
 
       {/* Action Buttons */}
       <View style={styles.buttonContainer}>
-        <Button title="Sign Up" onPress={handleSignUp} color="transparent" />
+        <Button title="Sign Up" onPress={handleSignUp} color="white" />
       </View>
 
       <View style={styles.buttonContainer}>
-        <Button title="Sign In" onPress={handleSignIn} color="transparent" />
+        <Button title="Sign In" onPress={handleSignIn} color="white" />
       </View>
     </View>
   );
