@@ -18,7 +18,7 @@ export default function LoginScreen({ navigation }) {
       const response = await createUserWithEmailAndPassword(
         auth,
         email,
-        password
+        password,
       );
 
       console.log(response);
@@ -70,11 +70,11 @@ export default function LoginScreen({ navigation }) {
 
       {/* Action Buttons */}
       <View style={styles.buttonContainer}>
-        <Button title="Sign Up" onPress={handleSignUp} color="white" />
+        <Button title="Sign Up" onPress={handleSignUp} color="transparent" />
       </View>
 
       <View style={styles.buttonContainer}>
-        <Button title="Sign In" onPress={handleSignIn} color="white" />
+        <Button title="Sign In" onPress={handleSignIn} color="transparent" />
       </View>
     </View>
   );
