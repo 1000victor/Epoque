@@ -16,7 +16,8 @@ import { useFocusEffect } from "@react-navigation/native";
 import * as SQLite from "expo-sqlite";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function CalenderScreen({ navigation }) {
+export default function CalenderScreen({ route, navigation }) {
+  const user = route.params?.foundUser;
   const [sunday, setSunday] = useState(() => {
     const date = new Date();
     date.setDate(date.getDate() - date.getDay());
