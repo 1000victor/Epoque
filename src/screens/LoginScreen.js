@@ -18,7 +18,7 @@ export default function LoginScreen({ navigation }) {
       const response = await createUserWithEmailAndPassword(
         auth,
         email,
-        password,
+        password
       );
 
       console.log(response);
