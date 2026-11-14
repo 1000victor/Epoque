@@ -9,12 +9,14 @@ import {
   Pressable,
   FlatList,
   Image,
+  Modal,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Location from "expo-location";
 import { useFocusEffect } from "@react-navigation/native";
 import * as SQLite from "expo-sqlite";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { resolveWebView } from "expo/src/dom/webview-wrapper.ts";
 
 export default function CalenderScreen({ route, navigation }) {
   const user = route.params?.foundUser;
@@ -31,6 +33,10 @@ export default function CalenderScreen({ route, navigation }) {
   const [locationStatus, setLocationStatus] = useState("loading");
   const [eventData, setEventData] = useState({});
   const [eventImages, setEventImages] = useState({});
+  // To allow fix date picker bouncing around
+  const [datePickerDate, setDatePickerDate] = useState(() => {
+    return new Date(sunday);
+  });
 
   // Weather codes provided by openmeteo api
   const weatherCode = {
@@ -197,80 +203,119 @@ export default function CalenderScreen({ route, navigation }) {
   }, []);
 
   return (
-    <View style={styles?.container}>
-      <View style={styles.navigationBar}>
-        <Button onPress={() => updateSunday("prev")} title="<" />
+    <View style={[styles?.container, { flexDirection: "row" }]}>
+      <Pressable
+        onPress={() => updateSunday("prev")}
+        style={({ pressed }) => [
+          {
+            backgroundColor: pressed ? "#ddd" : "#f0f0f0",
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            borderRadius: 8,
+            justifyContent: "center",
+          },
+        ]}
+      >
+        <Text style={{ fontSize: 18, fontWeight: "bold" }}>{"<-"}</Text>
+      </Pressable>
+      <View style={styles.container}>
         <Button
           onPress={() => setShowDatePicker(true)}
           title={
             weekdays[0].toDateString() + " - " + weekdays[6].toDateString()
           }
         />
-        <Button onPress={() => updateSunday("next")} title=">" />
-      </View>
-      <View style={{ flex: 1, justifyContent: "space-between" }}>
-        {weekdays.map((day, index) => {
-          const dateStr = formatDateString(day);
-          const currentEvent = eventData[dateStr];
-          const currentImages = eventImages[dateStr] || [];
-          const rawTitle = currentEvent?.title || "";
-          const truncatedTitle =
-            rawTitle.length > 35 ? rawTitle.substring(0, 35) + "..." : rawTitle;
+        <View style={{ flex: 1, justifyContent: "space-between" }}>
+          {weekdays.map((day, index) => {
+            const dateStr = formatDateString(day);
+            const currentEvent = eventData[dateStr];
+            const currentImages = eventImages[dateStr] || [];
+            const rawTitle = currentEvent?.title || "";
+            const truncatedTitle =
+              rawTitle.length > 35
+                ? rawTitle.substring(0, 35) + "..."
+                : rawTitle;
+            return (
+              <Pressable
+                key={index}
+                style={styles.dayContainer}
+                onPress={() =>
+                  navigation.navigate("EditEventScreen", {
+                    dateString: dateStr,
+                  })
+                }
+              >
+                <View style={styles.dayHeader}>
+                  <View style={{ flexDirection: "column" }}>
+                    <Text style={styles.dayText}>{day.toDateString()}</Text>
+                    <Text style={styles.eventText}>{truncatedTitle}</Text>
+                  </View>
 
-          return (
-            <Pressable
-              key={index}
-              style={styles.dayContainer}
-              onPress={() =>
-                navigation.navigate("EditEventScreen", { dateString: dateStr })
-              }
-            >
-              <View style={styles.dayHeader}>
-                <View style={{ flexDirection: "column" }}>
-                  <Text style={styles.dayText}>{day.toDateString()}</Text>
-                  <Text style={styles.eventText}>{truncatedTitle}</Text>
+                  <Text style={styles.dayText}>{getWeatherForDay(day)}</Text>
                 </View>
 
-                <Text style={styles.dayText}>{getWeatherForDay(day)}</Text>
-              </View>
-
-              {currentImages.length > 0 && (
-                <FlatList
-                  horizontal
-                  data={currentImages}
-                  keyExtractor={(img) => img.id.toString()}
-                  style={[styles.listStyle, { marginVertical: 2 }]}
-                  renderItem={({ item: img }) => (
-                    <View
-                      style={[
-                        styles.imageContainer,
-                        {
-                          width: 29,
-                          height: 29,
-                          aspectRatio: 3 / 4,
-                          marginRight: 2,
-                        },
-                      ]}
-                    >
-                      <Image source={{ uri: img.uri }} style={styles.image} />
-                    </View>
-                  )}
-                />
-              )}
-            </Pressable>
-          );
-        })}
+                {currentImages.length > 0 && (
+                  <FlatList
+                    horizontal
+                    data={currentImages}
+                    keyExtractor={(img) => img.id.toString()}
+                    style={[styles.listStyle, { marginVertical: 2 }]}
+                    renderItem={({ item: img }) => (
+                      <View style={styles.imageContainer}>
+                        <Image source={{ uri: img.uri }} style={styles.image} />
+                      </View>
+                    )}
+                  />
+                )}
+              </Pressable>
+            );
+          })}
+        </View>
       </View>
+      <Pressable
+        onPress={() => updateSunday("next")}
+        style={({ pressed }) => [
+          {
+            backgroundColor: pressed ? "#ddd" : "#f0f0f0",
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            borderRadius: 8,
+            justifyContent: "center",
+          },
+        ]}
+      >
+        <Text style={{ fontSize: 18, fontWeight: "bold" }}>{"->"}</Text>
+      </Pressable>
 
-      {showDatePicker && (
+      {showDatePicker && Platform.OS === "android" && (
         <DateTimePicker
           testID="dateTimePicker"
-          value={sunday}
+          value={datePickerDate}
           mode="date"
           is24Hour={true}
-          display="default"
+          display="inline"
           onChange={datePicker}
         />
+      )}
+      {showDatePicker && Platform.OS === "ios" && (
+        <Modal visible={showDatePicker} transparent={true}>
+          <View
+            style={[
+              styles.container,
+              { justifyContent: "center", alignItems: "center" },
+            ]}
+          >
+            <DateTimePicker
+              testID="dateTimePicker"
+              value={datePickerDate}
+              mode="date"
+              is24Hour={true}
+              display="inline"
+              onChange={datePicker}
+            />
+            <Button title="Done" onPress={() => setShowDatePicker(false)} />
+          </View>
+        </Modal>
       )}
       <StatusBar style="auto" />
     </View>

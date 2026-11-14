@@ -23,6 +23,8 @@ const styles = StyleSheet.create({
     padding: 5,
     borderWidth: 1,
     borderColor: "#ccc",
+    borderRadius: 10,
+    marginTop: 5,
   },
   dayText: {
     fontSize: 12,
@@ -44,7 +46,10 @@ const styles = StyleSheet.create({
   imageContainer: {
     marginRight: 5,
     aspectRatio: 3 / 4,
-    height: 140,
+    // height: 140,
+    width: "100%",
+    height: "100%",
+    flex: 1,
     borderRadius: 8,
     backgroundColor: "#ccc",
   },
