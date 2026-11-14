@@ -13,6 +13,8 @@ export default function App() {
     <ActionSheetProvider>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="LoginScreen">
+          {/*Mainly to not need to login each time*/}
+          {/* <Stack.Navigator initialRouteName="CalendarScreen">  */}
           <Stack.Screen name="LoginScreen" component={LoginScreen} />
           <Stack.Screen
             name="CalendarScreen"
