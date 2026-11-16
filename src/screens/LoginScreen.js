@@ -15,14 +15,7 @@ export default function LoginScreen({ navigation }) {
 
   async function handleSignUp() {
     try {
-      const response = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
-      console.log(response);
-      alert("Sign up success. User: " + email + " signed up.");
+      navigation.navigate("RegisterScreen");
     } catch (error) {
       console.log(error.message);
       alert(error.message);
@@ -69,12 +62,14 @@ export default function LoginScreen({ navigation }) {
       />
 
       {/* Action Buttons */}
-      <View style={styles.buttonContainer}>
-        <Button title="Sign Up" onPress={handleSignUp} color="white" />
-      </View>
 
       <View style={styles.buttonContainer}>
         <Button title="Sign In" onPress={handleSignIn} color="white" />
+      </View>
+
+      <View style={styles.signUpContainer}>
+        <Text style={styles.signUp}>Don't have an account?</Text>
+        <Button title="Sign Up" onPress={handleSignUp} color="white" />
       </View>
     </View>
   );
@@ -119,5 +114,15 @@ const styles = StyleSheet.create({
     marginTop: 20,
     textAlign: "center",
     color: "#888",
+  },
+  signUpContainer: {
+    textAlign: "center",
+    alignSelf: "center",
+    top: 150,
+  },
+  signUp: {
+    color: "white",
+    textAlign: "center",
+    alignSelf: "center",
   },
 });

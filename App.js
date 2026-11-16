@@ -2,6 +2,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import LoginScreen from "./src/screens/LoginScreen";
+import RegisterScreen from "./src/screens/RegisterScreen";
 import CalendarScreen from "./src/screens/CalendarScreen";
 import EditEventScreen from "./src/screens/EditEventScreen";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
@@ -16,6 +17,7 @@ export default function App() {
           {/*Mainly to not need to login each time*/}
           {/* <Stack.Navigator initialRouteName="CalendarScreen">  */}
           <Stack.Screen name="LoginScreen" component={LoginScreen} />
+          <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
           <Stack.Screen
             name="CalendarScreen"
             component={CalendarScreen}
