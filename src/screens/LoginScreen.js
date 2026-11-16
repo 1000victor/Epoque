@@ -6,7 +6,6 @@ import { useState } from "react";
 import { Button, StyleSheet, Text, TextInput, View } from "react-native";
 import { firebase_auth } from "../firebaseConfig";
 
-/* https://docs.expo.dev/versions/latest/sdk/glass-effect/ glass effect from expo*/
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -63,7 +62,6 @@ export default function LoginScreen({ navigation }) {
       />
 
       {/* Action Buttons */}
-
       <View style={styles.buttonContainer}>
         <Button title="Sign In" onPress={handleSignIn} color="white" />
       </View>
@@ -98,6 +96,10 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: "#1D1D1D",
     color: "white",
+    shadowColor: "#FFFFFF",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
   },
   buttonContainer: {
     marginTop: 15,
@@ -125,5 +127,10 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     alignSelf: "center",
+  },
+  glass1: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
   },
 });
