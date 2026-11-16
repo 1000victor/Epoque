@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Button, StyleSheet, Text, TextInput, View } from "react-native";
 import { firebase_auth } from "../firebaseConfig";
 
+/* https://docs.expo.dev/versions/latest/sdk/glass-effect/ glass effect from expo*/
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
