@@ -3,7 +3,14 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { useState } from "react";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Button,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Pressable,
+} from "react-native";
 import { firebase_auth } from "../firebaseConfig";
 
 export default function LoginScreen({ navigation }) {
@@ -64,12 +71,42 @@ export default function LoginScreen({ navigation }) {
       {/* Action Buttons */}
 
       <View style={styles.buttonContainer}>
-        <Button title="Sign In" onPress={handleSignIn} color="white" />
+        {/* <Button title="Sign In" onPress={handleSignIn} color="white" /> */}
+        <Pressable onPress={handleSignIn}>
+          <Text
+            style={[
+              {
+                color: "white",
+                textAlign: "center",
+                padding: 7,
+                fontWeight: "bold",
+              },
+            ]}
+          >
+            Sign In
+          </Text>
+        </Pressable>
       </View>
 
       <View style={styles.signUpContainer}>
         <Text style={styles.signUp}>Don't have an account?</Text>
-        <Button title="Sign Up" onPress={handleSignUp} color="white" />
+        {/* <Button title="Sign Up" onPress={handleSignUp} color="white" /> */}
+        <View style={styles.buttonContainer}>
+          <Pressable onPress={handleSignUp}>
+            <Text
+              style={[
+                {
+                  color: "white",
+                  textAlign: "center",
+                  padding: 7,
+                  fontWeight: "bold",
+                },
+              ]}
+            >
+              Sign Up
+            </Text>
+          </Pressable>
+        </View>
       </View>
     </View>
   );
