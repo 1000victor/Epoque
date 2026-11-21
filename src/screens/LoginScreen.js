@@ -90,23 +90,20 @@ export default function LoginScreen({ navigation }) {
 
       <View style={styles.signUpContainer}>
         <Text style={styles.signUp}>Don't have an account?</Text>
-        {/* <Button title="Sign Up" onPress={handleSignUp} color="white" /> */}
-        <View style={styles.buttonContainer}>
-          <Pressable onPress={handleSignUp}>
-            <Text
-              style={[
-                {
-                  color: "white",
-                  textAlign: "center",
-                  padding: 7,
-                  fontWeight: "bold",
-                },
-              ]}
-            >
-              Sign Up
-            </Text>
-          </Pressable>
-        </View>
+        <Pressable onPress={handleSignUp}>
+          <Text
+            style={[
+              {
+                color: "white",
+                textAlign: "center",
+                padding: 7,
+                fontWeight: "bold",
+              },
+            ]}
+          >
+            Register an account
+          </Text>
+        </Pressable>
       </View>
     </View>
   );

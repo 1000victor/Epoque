@@ -33,7 +33,7 @@ export default function CalenderScreen({ route, navigation }) {
   const [locationStatus, setLocationStatus] = useState("loading");
   const [eventData, setEventData] = useState({});
   const [eventImages, setEventImages] = useState({});
-  // To allow fix date picker bouncing around
+  // To fix date picker bouncing around
   const [datePickerDate, setDatePickerDate] = useState(() => {
     return new Date(sunday);
   });
@@ -120,6 +120,9 @@ export default function CalenderScreen({ route, navigation }) {
     if (locationStatus === "denied") {
       return "Location disabled";
     }
+    if (locationStatus === "error") {
+      return "Weather unavailable";
+    }
     if (!weatherJSON || !weatherJSON.daily) {
       return "Loading weather...";
     }
@@ -191,12 +194,15 @@ export default function CalenderScreen({ route, navigation }) {
         const response = await fetch(url);
         if (!response.ok) {
           console.error("Weather fetch failed");
+          setLocationStatus("error");
+          return;
         }
         const data = await response.json();
         setWeatherJSON(data);
         setLocationStatus("granted");
       } catch (e) {
         console.error(e);
+        setLocationStatus("error");
       }
     };
     fetchWeather();
@@ -216,7 +222,7 @@ export default function CalenderScreen({ route, navigation }) {
           },
         ]}
       >
-        <Text style={{ fontSize: 18, fontWeight: "bold" }}>{"<-"}</Text>
+        <Text style={{ fontSize: 18, fontWeight: "bold" }}>{"<"}</Text>
       </Pressable>
       <View style={styles.container}>
         <Button
@@ -238,7 +244,13 @@ export default function CalenderScreen({ route, navigation }) {
             return (
               <Pressable
                 key={index}
-                style={styles.dayContainer}
+                style={[
+                  styles.dayContainer,
+                  dateStr == formatDateString(new Date()) && {
+                    borderColor: "#007AFF",
+                    borderWidth: 1,
+                  },
+                ]}
                 onPress={() =>
                   navigation.navigate("EditEventScreen", {
                     dateString: dateStr,
@@ -284,7 +296,7 @@ export default function CalenderScreen({ route, navigation }) {
           },
         ]}
       >
-        <Text style={{ fontSize: 18, fontWeight: "bold" }}>{"->"}</Text>
+        <Text style={{ fontSize: 18, fontWeight: "bold" }}>{">"}</Text>
       </Pressable>
 
       {showDatePicker && Platform.OS === "android" && (

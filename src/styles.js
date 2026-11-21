@@ -5,13 +5,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     backgroundColor: "#eee",
-    marginBottom: 40,
-  },
-  navigationBar: {
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    marginBottom: 5,
+    paddingBottom: 30,
+    paddingTop: 10,
+    justifyContent: "space-between",
   },
   dayHeader: {
     flexDirection: "row",
@@ -24,7 +20,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 10,
-    marginTop: 5,
+    marginTop: 10,
   },
   dayText: {
     fontSize: 12,
@@ -46,7 +42,6 @@ const styles = StyleSheet.create({
   imageContainer: {
     marginRight: 5,
     aspectRatio: 3 / 4,
-    // height: 140,
     width: "100%",
     height: "100%",
     flex: 1,
@@ -68,7 +63,10 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
     fontSize: 14,
     color: "#333",
-    marginBottom: 15,
+  },
+  map: {
+    width: "100%",
+    height: 200,
   },
 });
 export default styles;
