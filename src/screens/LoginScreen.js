@@ -12,6 +12,7 @@ import {
   Pressable,
 } from "react-native";
 import { firebase_auth } from "../firebaseConfig";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -44,68 +45,91 @@ export default function LoginScreen({ navigation }) {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Epoque</Text>
-
-      {/* Email Input */}
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        placeholderTextColor="#787878"
-      />
-
-      {/* Password Input */}
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry={true} // hides text for security (dots/asterisks)
-        value={password}
-        onChangeText={setPassword}
-        placeholderTextColor="#787878"
-      />
-
-      {/* Action Buttons */}
-
-      <View style={styles.buttonContainer}>
-        {/* <Button title="Sign In" onPress={handleSignIn} color="white" /> */}
-        <Pressable onPress={handleSignIn}>
+    <LinearGradient
+      colors={["#ff0000", "#ff00f7", "#6f00ff"]}
+      // locations={[0, 0.25, 0.75, 1]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+      style={{ flex: 1 }}
+    >
+      <LinearGradient
+        colors={["#ffffff00", "#1a0036"]}
+        // locations={[0, 0.25, 0.75, 1]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 0.6 }}
+        style={{ flex: 1 }}
+      >
+        <View style={styles.container}>
           <Text
-            style={[
-              {
-                color: "white",
-                textAlign: "center",
-                padding: 7,
-                fontWeight: "bold",
-              },
-            ]}
+            style={[styles.header, { fontWeight: "bold", marginBottom: 12 }]}
           >
-            Sign In
+            Époque
           </Text>
-        </Pressable>
-      </View>
+          <Text style={[styles.header, { fontSize: 16, fontStyle: "italic" }]}>
+            Episodic memories are saved here
+          </Text>
 
-      <View style={styles.signUpContainer}>
-        <Text style={styles.signUp}>Don't have an account?</Text>
-        <Pressable onPress={handleSignUp}>
-          <Text
-            style={[
-              {
-                color: "white",
-                textAlign: "center",
-                padding: 7,
-                fontWeight: "bold",
-              },
-            ]}
-          >
-            Register an account
-          </Text>
-        </Pressable>
-      </View>
-    </View>
+          {/* Email Input */}
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            placeholderTextColor="#787878"
+          />
+
+          {/* Password Input */}
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            secureTextEntry={true} // hides text for security (dots/asterisks)
+            value={password}
+            onChangeText={setPassword}
+            placeholderTextColor="#787878"
+          />
+
+          {/* Action Buttons */}
+
+          <View style={styles.buttonContainer}>
+            {/* <Button title="Sign In" onPress={handleSignIn} color="white" /> */}
+            <Pressable onPress={handleSignIn}>
+              <Text
+                style={[
+                  {
+                    color: "white",
+                    textAlign: "center",
+                    padding: 7,
+                    fontWeight: "bold",
+                  },
+                ]}
+              >
+                Sign In
+              </Text>
+            </Pressable>
+          </View>
+
+          <View style={styles.signUpContainer}>
+            <Text style={styles.signUp}>Don't have an account?</Text>
+            <Pressable onPress={handleSignUp}>
+              <Text
+                style={[
+                  {
+                    color: "white",
+                    textAlign: "center",
+                    padding: 7,
+                    fontWeight: "bold",
+                  },
+                ]}
+              >
+                Register an account
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </LinearGradient>
+    </LinearGradient>
   );
 }
 
@@ -114,10 +138,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     padding: 16,
-    backgroundColor: "#0F0F0F",
+    // backgroundColor: "#0F0F0F",
   },
   header: {
-    fontSize: 24,
+    fontSize: 42,
     marginBottom: 24,
     textAlign: "center",
     color: "white",
@@ -152,7 +176,7 @@ const styles = StyleSheet.create({
   signUpContainer: {
     textAlign: "center",
     alignSelf: "center",
-    top: 150,
+    top: 120,
   },
   signUp: {
     color: "white",
