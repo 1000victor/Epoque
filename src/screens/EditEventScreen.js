@@ -16,6 +16,8 @@ import * as ImagePicker from "expo-image-picker";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import * as SQLite from "expo-sqlite";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LinearGradient } from "expo-linear-gradient";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function EditEventScreen({ navigation, route }) {
   const { dateString } = route.params;
@@ -240,159 +242,204 @@ export default function EditEventScreen({ navigation, route }) {
   };
 
   return (
-    <View style={[styles.container]}>
-      <ScrollView contentContainerStyle={{ gap: 10, paddingBottom: 60 }}>
-        <Text style={[styles.eventDayText, { fontSize: 20 }]}>
-          {date.toDateString()}
-        </Text>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-around",
-          }}
-        >
-          <Text style={{ fontWeight: "bold" }}>Title: </Text>
-          <TextInput
-            style={[styles.textinput, { flex: 1 }]}
-            onChangeText={(text) => {
-              setTitle(text);
-              AsyncStorage.setItem(
-                dateString,
-                JSON.stringify({ title: text, notes: notes }),
-              );
-            }}
-            value={title}
-            placeholder="Enter event title"
-          />
-        </View>
-        {images.length > 0 ? (
-          <FlatList
-            data={images}
-            horizontal
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <View style={[styles.imageContainer]}>
-                <Image source={{ uri: item.uri }} style={styles.image} />
-                <Pressable
-                  onPress={() => deleteImage(item.id)}
-                  style={({ pressed }) => ({
-                    position: "absolute",
-                    top: 4,
-                    right: 4,
-                    alignSelf: "flex-end",
-                    width: 22,
-                    height: 22,
-                    borderRadius: 11,
-                    backgroundColor: pressed
-                      ? "rgba(0, 0, 0, 0.85)"
-                      : "rgba(0, 0, 0, 0.65)",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  })}
-                >
+    <LinearGradient
+      colors={["#a32540", "#ff00f7", "#5747ec"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+      style={{ flex: 1 }}
+    >
+      <LinearGradient
+        colors={["#1a0036", "#ffffff00", "#1a0036"]}
+        start={{ x: 0, y: 0.27 }}
+        end={{ x: 0, y: 0.66 }}
+        style={{ flex: 1 }}
+      >
+        <SafeAreaView edges={["bottom"]} style={{ flex: 1 }}>
+          <View style={[styles.container]}>
+            <ScrollView contentContainerStyle={{ gap: 10, paddingBottom: 60 }}>
+              <Text
+                style={[styles.eventDayText, { fontSize: 20, color: "#eee" }]}
+              >
+                {date.toDateString()}
+              </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-around",
+                }}
+              >
+                <Text style={{ fontWeight: "bold", color: "#eee" }}>
+                  Title:{" "}
+                </Text>
+                <TextInput
+                  style={[styles.textinput, { flex: 1 }]}
+                  onChangeText={(text) => {
+                    setTitle(text);
+                    AsyncStorage.setItem(
+                      dateString,
+                      JSON.stringify({ title: text, notes: notes }),
+                    );
+                  }}
+                  value={title}
+                  placeholder="Enter event title"
+                />
+              </View>
+              {images.length > 0 ? (
+                <FlatList
+                  data={images}
+                  horizontal
+                  keyExtractor={(item) => item.id.toString()}
+                  renderItem={({ item }) => (
+                    <View style={[styles.imageContainer]}>
+                      <Image source={{ uri: item.uri }} style={styles.image} />
+                      <Pressable
+                        onPress={() => deleteImage(item.id)}
+                        style={({ pressed }) => ({
+                          position: "absolute",
+                          top: 4,
+                          right: 4,
+                          alignSelf: "flex-end",
+                          width: 22,
+                          height: 22,
+                          borderRadius: 11,
+                          backgroundColor: pressed
+                            ? "rgba(0, 0, 0, 0.85)"
+                            : "rgba(0, 0, 0, 0.65)",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        })}
+                      >
+                        <Text
+                          style={{
+                            color: "#ffffff",
+                            includeFontPadding: false,
+                            fontWeight: "bold",
+                          }}
+                        >
+                          x
+                        </Text>
+                      </Pressable>
+                    </View>
+                  )}
+                  style={styles.listStyle}
+                />
+              ) : (
+                <Text style={{ color: "#eee" }}>No images added yet.</Text>
+              )}
+              <View style={styles.buttonContainer}>
+                <Pressable onPress={showActionSheet}>
                   <Text
-                    style={{
-                      color: "#ffffff",
-                      includeFontPadding: false,
-                      fontWeight: "bold",
-                    }}
+                    style={[
+                      {
+                        color: "white",
+                        textAlign: "center",
+                        padding: 7,
+                        fontWeight: "bold",
+                      },
+                    ]}
                   >
-                    x
+                    Add image
                   </Text>
                 </Pressable>
               </View>
-            )}
-            style={styles.listStyle}
-          />
-        ) : (
-          <Text>No images added yet.</Text>
-        )}
-        <Button title="Add image" onPress={showActionSheet} />
-        {lastAddedCoord && (
-          <View>
-            <MapView
-              style={styles.map}
-              ref={mapRef}
-              initialRegion={{
-                latitude: lastAddedCoord.latitude,
-                longitude: lastAddedCoord.longitude,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-              }}
-              showsMyLocationButton
-              showsUserLocation
-            >
-              {imagesWithCoords.flatMap((img) => [
-                <Marker
-                  key={`${img.id}-pin`}
-                  coordinate={{
-                    latitude: img.coords.latitude,
-                    longitude: img.coords.longitude,
-                  }}
-                />,
-                <Marker
-                  key={`${img.id}-photo`}
-                  coordinate={{
-                    latitude: img.coords.latitude,
-                    longitude: img.coords.longitude,
-                  }}
-                  anchor={{ x: 0.5, y: 1.85 }}
-                  tappable={false}
-                >
+              {lastAddedCoord && (
+                <View>
+                  <MapView
+                    style={styles.map}
+                    ref={mapRef}
+                    initialRegion={{
+                      latitude: lastAddedCoord.latitude,
+                      longitude: lastAddedCoord.longitude,
+                      latitudeDelta: 0.01,
+                      longitudeDelta: 0.01,
+                    }}
+                    showsMyLocationButton
+                    showsUserLocation
+                  >
+                    {imagesWithCoords.flatMap((img) => [
+                      <Marker
+                        key={`${img.id}-pin`}
+                        coordinate={{
+                          latitude: img.coords.latitude,
+                          longitude: img.coords.longitude,
+                        }}
+                      />,
+                      <Marker
+                        key={`${img.id}-photo`}
+                        coordinate={{
+                          latitude: img.coords.latitude,
+                          longitude: img.coords.longitude,
+                        }}
+                        anchor={{ x: 0.5, y: 1.85 }}
+                        tappable={false}
+                      >
+                        <View
+                          style={{
+                            width: 48,
+                            height: 48,
+                            borderRadius: 8,
+                            overflow: "hidden",
+                            borderWidth: 2,
+                            borderColor: "#ffffff",
+                            backgroundColor: "#eee",
+                          }}
+                        >
+                          <Image
+                            source={{ uri: img.uri }}
+                            style={{ width: "100%", height: "100%" }}
+                          />
+                        </View>
+                      </Marker>,
+                    ])}
+                  </MapView>
                   <View
                     style={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: 8,
-                      overflow: "hidden",
-                      borderWidth: 2,
-                      borderColor: "#ffffff",
-                      backgroundColor: "#eee",
+                      borderWidth: 1,
+                      borderColor: "#eee",
                     }}
                   >
-                    <Image
-                      source={{ uri: img.uri }}
-                      style={{ width: "100%", height: "100%" }}
-                    />
+                    <Text
+                      style={{
+                        padding: 10,
+                        textAlign: "left",
+                        fontWeight: "bold",
+                        color: "#eee",
+                      }}
+                    >
+                      Estimated distance from {imagesWithCoords.length}{" "}
+                      {imagesWithCoords.length === 1 ? "photo" : "photos"}:{" "}
+                      {formatDistance(totalDistanceMeters)}
+                    </Text>
                   </View>
-                </Marker>,
-              ])}
-            </MapView>
-            <View
-              style={{
-                borderWidth: 1,
-              }}
-            >
+                </View>
+              )}
               <Text
                 style={{
-                  padding: 10,
-                  textAlign: "left",
+                  textAlign: "center",
                   fontWeight: "bold",
+                  color: "#eee",
                 }}
               >
-                Estimated distance from {imagesWithCoords.length}{" "}
-                {imagesWithCoords.length === 1 ? "photo" : "photos"}:{" "}
-                {formatDistance(totalDistanceMeters)}
+                Notes:
               </Text>
-            </View>
+              <TextInput
+                multiline={true}
+                style={[styles.textinput, { height: 200 }]}
+                onChangeText={(text) => {
+                  setNotes(text);
+                  AsyncStorage.setItem(
+                    dateString,
+                    JSON.stringify({ title: title, notes: text }),
+                  );
+                }}
+                value={notes}
+                placeholder="Enter event notes"
+              />
+            </ScrollView>
           </View>
-        )}
-        <Text style={{ textAlign: "center", fontWeight: "bold" }}>Notes:</Text>
-        <TextInput
-          multiline={true}
-          style={[styles.textinput, { height: 200 }]}
-          onChangeText={(text) => {
-            setNotes(text);
-            AsyncStorage.setItem(
-              dateString,
-              JSON.stringify({ title: title, notes: text }),
-            );
-          }}
-          value={notes}
-          placeholder="Enter event notes"
-        />
-      </ScrollView>
-    </View>
+        </SafeAreaView>
+      </LinearGradient>
+    </LinearGradient>
   );
 }

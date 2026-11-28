@@ -3,8 +3,8 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
-    backgroundColor: "#eee",
+    padding: 20,
+    // backgroundColor: "#eee",
     paddingBottom: 30,
     paddingTop: 10,
     justifyContent: "space-between",
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   textinput: {
-    backgroundColor: "#fff",
+    backgroundColor: "#ccc",
     borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 8,
@@ -67,6 +67,16 @@ const styles = StyleSheet.create({
   map: {
     width: "100%",
     height: 200,
+  },
+  buttonContainer: {
+    padding: 5,
+    borderColor: "white",
+    borderWidth: 1,
+    color: "white",
+    borderRadius: 40,
+    backgroundColor: "#1D1D1D",
+    width: 200,
+    alignSelf: "center",
   },
 });
 export default styles;

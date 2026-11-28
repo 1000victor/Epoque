@@ -53,7 +53,7 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <LinearGradient
-      colors={["#ff0000", "#ff00f7", "#6f00ff"]}
+      colors={["#a32540", "#ff00f7", "#5747ec"]}
       // locations={[0, 0.25, 0.75, 1]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
