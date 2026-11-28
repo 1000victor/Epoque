@@ -8,6 +8,8 @@ import {
   ScrollView,
   Pressable,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { useState, useEffect, useRef } from "react";
@@ -255,80 +257,92 @@ export default function EditEventScreen({ navigation, route }) {
         style={{ flex: 1 }}
       >
         <SafeAreaView edges={["bottom"]} style={{ flex: 1 }}>
-          <View style={[styles.container]}>
-            <ScrollView contentContainerStyle={{ gap: 10, paddingBottom: 60 }}>
-              <Text
-                style={[styles.eventDayText, { fontSize: 20, color: "#eee" }]}
+          <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+          >
+            <View style={[styles.container]}>
+              <ScrollView
+                contentContainerStyle={{ gap: 10, paddingBottom: 60 }}
               >
-                {date.toDateString()}
-              </Text>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-around",
-                }}
-              >
-                <Text style={{ fontWeight: "bold", color: "#eee" }}>
-                  Title:{" "}
+                <Text
+                  style={[styles.eventDayText, { fontSize: 20, color: "#eee" }]}
+                >
+                  {date.toDateString()}
                 </Text>
-                <TextInput
-                  style={[styles.textinput, { flex: 1 }]}
-                  onChangeText={(text) => {
-                    setTitle(text);
-                    AsyncStorage.setItem(
-                      dateString,
-                      JSON.stringify({ title: text, notes: notes }),
-                    );
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-around",
                   }}
-                  value={title}
-                  placeholder="Enter event title"
-                />
-              </View>
-              {images.length > 0 ? (
-                <FlatList
-                  data={images}
-                  horizontal
-                  keyExtractor={(item) => item.id.toString()}
-                  renderItem={({ item }) => (
-                    <View style={[styles.imageContainer]}>
-                      <Image source={{ uri: item.uri }} style={styles.image} />
-                      <Pressable
-                        onPress={() => deleteImage(item.id)}
-                        style={({ pressed }) => ({
-                          position: "absolute",
-                          top: 4,
-                          right: 4,
-                          alignSelf: "flex-end",
-                          width: 22,
-                          height: 22,
-                          borderRadius: 11,
-                          backgroundColor: pressed
-                            ? "rgba(0, 0, 0, 0.85)"
-                            : "rgba(0, 0, 0, 0.65)",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        })}
-                      >
-                        <Text
-                          style={{
-                            color: "#ffffff",
-                            includeFontPadding: false,
-                            fontWeight: "bold",
-                          }}
+                >
+                  <Text style={{ fontWeight: "bold", color: "#eee" }}>
+                    Title:{" "}
+                  </Text>
+                  <TextInput
+                    style={[styles.textinput, { flex: 1 }]}
+                    onChangeText={(text) => {
+                      setTitle(text);
+                    }}
+                    value={title}
+                    placeholderTextColor={"#bbb"}
+                    placeholder="Enter event title"
+                  />
+                </View>
+                {images.length > 0 ? (
+                  <FlatList
+                    data={images}
+                    horizontal
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                      <View style={[styles.imageContainer]}>
+                        <Image
+                          source={{ uri: item.uri }}
+                          style={styles.image}
+                        />
+                        <Pressable
+                          onPress={() => deleteImage(item.id)}
+                          style={({ pressed }) => ({
+                            position: "absolute",
+                            top: 4,
+                            right: 4,
+                            alignSelf: "flex-end",
+                            width: 22,
+                            height: 22,
+                            borderRadius: 11,
+                            backgroundColor: pressed
+                              ? "rgba(0, 0, 0, 0.85)"
+                              : "rgba(0, 0, 0, 0.65)",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          })}
                         >
-                          x
-                        </Text>
-                      </Pressable>
-                    </View>
-                  )}
-                  style={styles.listStyle}
-                />
-              ) : (
-                <Text style={{ color: "#eee" }}>No images added yet.</Text>
-              )}
-              <View style={styles.buttonContainer}>
-                <Pressable onPress={showActionSheet}>
+                          <Text
+                            style={{
+                              color: "#ffffff",
+                              includeFontPadding: false,
+                              fontWeight: "bold",
+                            }}
+                          >
+                            x
+                          </Text>
+                        </Pressable>
+                      </View>
+                    )}
+                    style={styles.listStyle}
+                  />
+                ) : (
+                  <Text style={{ color: "#eee" }}>No images added yet.</Text>
+                )}
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.buttonContainer,
+                    pressed && { backgroundColor: "#34148b" },
+                  ]}
+                  onPress={showActionSheet}
+                >
                   <Text
                     style={[
                       {
@@ -342,102 +356,99 @@ export default function EditEventScreen({ navigation, route }) {
                     Add image
                   </Text>
                 </Pressable>
-              </View>
-              {lastAddedCoord && (
-                <View>
-                  <MapView
-                    style={styles.map}
-                    ref={mapRef}
-                    initialRegion={{
-                      latitude: lastAddedCoord.latitude,
-                      longitude: lastAddedCoord.longitude,
-                      latitudeDelta: 0.01,
-                      longitudeDelta: 0.01,
-                    }}
-                    showsMyLocationButton
-                    showsUserLocation
-                  >
-                    {imagesWithCoords.flatMap((img) => [
-                      <Marker
-                        key={`${img.id}-pin`}
-                        coordinate={{
-                          latitude: img.coords.latitude,
-                          longitude: img.coords.longitude,
-                        }}
-                      />,
-                      <Marker
-                        key={`${img.id}-photo`}
-                        coordinate={{
-                          latitude: img.coords.latitude,
-                          longitude: img.coords.longitude,
-                        }}
-                        anchor={{ x: 0.5, y: 1.85 }}
-                        tappable={false}
-                      >
-                        <View
-                          style={{
-                            width: 48,
-                            height: 48,
-                            borderRadius: 8,
-                            overflow: "hidden",
-                            borderWidth: 2,
-                            borderColor: "#ffffff",
-                            backgroundColor: "#eee",
+                {lastAddedCoord && (
+                  <View>
+                    <MapView
+                      style={styles.map}
+                      ref={mapRef}
+                      initialRegion={{
+                        latitude: lastAddedCoord.latitude,
+                        longitude: lastAddedCoord.longitude,
+                        latitudeDelta: 0.01,
+                        longitudeDelta: 0.01,
+                      }}
+                      showsMyLocationButton
+                      showsUserLocation
+                    >
+                      {imagesWithCoords.flatMap((img) => [
+                        <Marker
+                          key={`${img.id}-pin`}
+                          coordinate={{
+                            latitude: img.coords.latitude,
+                            longitude: img.coords.longitude,
                           }}
+                        />,
+                        <Marker
+                          key={`${img.id}-photo`}
+                          coordinate={{
+                            latitude: img.coords.latitude,
+                            longitude: img.coords.longitude,
+                          }}
+                          anchor={{ x: 0.5, y: 1.85 }}
+                          tappable={false}
                         >
-                          <Image
-                            source={{ uri: img.uri }}
-                            style={{ width: "100%", height: "100%" }}
-                          />
-                        </View>
-                      </Marker>,
-                    ])}
-                  </MapView>
-                  <View
-                    style={{
-                      borderWidth: 1,
-                      borderColor: "#eee",
-                    }}
-                  >
-                    <Text
+                          <View
+                            style={{
+                              width: 48,
+                              height: 48,
+                              borderRadius: 8,
+                              overflow: "hidden",
+                              borderWidth: 2,
+                              borderColor: "#ffffff",
+                              backgroundColor: "#eee",
+                            }}
+                          >
+                            <Image
+                              source={{ uri: img.uri }}
+                              style={{ width: "100%", height: "100%" }}
+                            />
+                          </View>
+                        </Marker>,
+                      ])}
+                    </MapView>
+                    <View
                       style={{
-                        padding: 10,
-                        textAlign: "left",
-                        fontWeight: "bold",
-                        color: "#eee",
+                        borderWidth: 1,
+                        borderColor: "#eee",
                       }}
                     >
-                      Estimated distance from {imagesWithCoords.length}{" "}
-                      {imagesWithCoords.length === 1 ? "photo" : "photos"}:{" "}
-                      {formatDistance(totalDistanceMeters)}
-                    </Text>
+                      <Text
+                        style={{
+                          padding: 10,
+                          textAlign: "left",
+                          fontWeight: "bold",
+                          color: "#eee",
+                        }}
+                      >
+                        Estimated distance from {imagesWithCoords.length}{" "}
+                        {imagesWithCoords.length === 1 ? "photo" : "photos"}:{" "}
+                        {formatDistance(totalDistanceMeters)}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              )}
-              <Text
-                style={{
-                  textAlign: "center",
-                  fontWeight: "bold",
-                  color: "#eee",
-                }}
-              >
-                Notes:
-              </Text>
-              <TextInput
-                multiline={true}
-                style={[styles.textinput, { height: 200 }]}
-                onChangeText={(text) => {
-                  setNotes(text);
-                  AsyncStorage.setItem(
-                    dateString,
-                    JSON.stringify({ title: title, notes: text }),
-                  );
-                }}
-                value={notes}
-                placeholder="Enter event notes"
-              />
-            </ScrollView>
-          </View>
+                )}
+                <Text
+                  style={{
+                    textAlign: "center",
+                    fontWeight: "bold",
+                    color: "#eee",
+                  }}
+                >
+                  Notes:
+                </Text>
+                <TextInput
+                  multiline={true}
+                  style={[styles.textinput, { height: 200 }]}
+                  onChangeText={(text) => {
+                    setNotes(text);
+                  }}
+                  value={notes}
+                  placeholderTextColor={"#bbb"}
+                  placeholder="Enter event notes"
+                />
+              </ScrollView>
+            </View>
+          </KeyboardAvoidingView>
         </SafeAreaView>
       </LinearGradient>
     </LinearGradient>

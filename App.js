@@ -13,9 +13,9 @@ export default function App() {
   return (
     <ActionSheetProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="LoginScreen">
-          {/*Mainly to not need to login each time*/}
-          {/* <Stack.Navigator initialRouteName="CalendarScreen"> */}
+        {/* <Stack.Navigator initialRouteName="LoginScreen"> */}
+        {/*Mainly to not need to login each time*/}
+        <Stack.Navigator initialRouteName="CalendarScreen">
           <Stack.Screen name="LoginScreen" component={LoginScreen} />
           <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
           <Stack.Screen
